@@ -157,6 +157,7 @@ function render(){
   lo.hidden=!session;
   tabs.querySelectorAll("button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===view?"page":"false"));
   if(me)ensureSide(); else document.getElementById("mwSide")?.remove();
+  if(view!=="profile"&&view!=="setup")formSide=null;
   if(view==="newpass")return newPass();
   if(view==="landing")landing();
   else if(view==="role")roleView();
@@ -305,10 +306,15 @@ function sliders(list,vals,name,hint){
     ${sub?`<span class="sl-s" id="d_${name}_${k}">${esc(sub)}</span>`:""}</div>`}).join("")}</div>`}
 function opts(list,v){return list.map(o=>`<option ${o===v?"selected":""}>${esc(o)}</option>`).join("")}
 
+let formSide=null;
 function setup(){
-  const isC=me.role==="cand",d=isC?(mine||{}):(myOffer||{});
+  if(formSide!=="cand"&&formSide!=="ent")formSide=me.role;
+  const isC=formSide==="cand",d=isC?(mine||{}):(myOffer||{});
   const first=isC?!mine:!myOffer;
-  app.innerHTML=isC?`
+  const onglets=`<div class="segmented" id="fside" role="tablist" style="margin-bottom:16px">
+    <button type="button" role="tab" data-s="cand" aria-selected="${isC}">Mon profil candidat${mine?" ✓":""}</button>
+    <button type="button" role="tab" data-s="ent" aria-selected="${!isC}">Mon offre d'emploi${myOffer?" ✓":""}</button></div>`;
+  app.innerHTML=onglets+(isC?`
   <h1 class="pagetitle">${first?"Créer mon profil":"Mon profil"}</h1>
   <p class="lead">Les recruteurs voient le métier, l'expérience et les trois dimensions. Le nom, l'âge et le téléphone restent stockés à part et ne sortent qu'au match.</p>
   <form class="pf" id="f">
@@ -361,8 +367,12 @@ function setup(){
       <label class="f">Contact du recruteur<input type="text" name="contact" value="${esc(d.contact||"")}" placeholder="Prénom Nom — téléphone"></label>
     </div>
     <button class="submit">${first?"Enregistrer et découvrir les profils":"Enregistrer les modifications"}</button>
-  </form>`;
-  if(!first)app.insertAdjacentHTML("beforeend",`<section class="rgpd">
+  </form>`);
+  app.querySelector("#fside").onclick=e=>{
+    const b=e.target.closest("button");if(!b)return;
+    formSide=b.dataset.s;setup();scrollTo(0,0);
+  };
+  if(mine||myOffer)app.insertAdjacentHTML("beforeend",`<section class="rgpd">
     <h2>Mes données</h2>
     <p class="small">Tu peux récupérer l'ensemble de tes données ou supprimer définitivement ton compte. La suppression efface le profil, les décisions, les matchs et les messages, sans copie de sauvegarde.</p>
     <div class="toolrow"><button class="ghost" id="exp">Exporter mes données</button><button class="danger" id="del">Supprimer mon compte</button></div></section>`);
@@ -400,7 +410,8 @@ async function onSave(e){
   const btn=e.target.querySelector(".submit");btn.disabled=true;
   try{
     const f=Object.fromEntries(new FormData(e.target)),g=readGroups();
-    if(me.role==="cand"){
+    const side=formSide||me.role;
+    if(side==="cand"){
       const pub={id:me.id,metier:f.metier,exp:Number(f.exp)||0,ville:f.ville,mobilite:Number(f.mobilite)||0,contrat:f.contrat,
         savoirs:g.savoirs,sf:g.sf,se:g.se,moteurs:g.moteurs,fierte:f.fierte,bienfait:f.bienfait,updated_at:new Date().toISOString()};
       let r=await sb.from("cand_public").upsert(pub);if(r.error)throw r.error;
@@ -413,7 +424,8 @@ async function onSave(e){
       else{const r=await sb.from("offers").insert(row).select("id").single();if(r.error)throw r.error;id=r.data.id}
       const r2=await sb.from("offer_private").upsert({offer_id:id,contact:f.contact||null});if(r2.error)throw r2.error;
     }
-    view="deck";toast("Enregistré.");await refresh();
+    if(me.role!==side){const r3=await sb.from("profiles").update({role:side}).eq("id",me.id);if(!r3.error)me.role=side}
+    formSide=null;view="deck";toast("Enregistré.");await refresh();
   }catch(err){toast(err.message||"Enregistrement impossible.")}
   finally{busy=false;btn.disabled=false}
 }
