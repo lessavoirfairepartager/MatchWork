@@ -5,6 +5,6 @@
    qu'à ce que les politiques RLS autorisent. Ne mets JAMAIS ici la
    clé « service_role ». */
 window.MW_CONFIG = {
-  url: "https://VOTRE-PROJET.supabase.co",
-  key: "VOTRE_CLE_ANON_PUBLIQUE"
+  url: "https://lfzvqbpiheegwhgjbpvm.supabase.co",
+  key: "sb_publishable_5jZ1XhIZ_hpwb6axroAYeQ_xm8tbzSg"
 };
