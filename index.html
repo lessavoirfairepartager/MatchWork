@@ -121,6 +121,29 @@ async function refresh(){
   }
   render();
 }
+function ensureSide(){
+  const tools=document.querySelector(".tools");
+  if(!tools||!me)return;
+  let b=document.getElementById("mwSide");
+  if(!b){
+    b=document.createElement("button");
+    b.id="mwSide";b.className="pill txt";b.type="button";
+    b.onclick=switchSide;
+    tools.insertBefore(b,tools.firstChild.nextSibling||null);
+  }
+  const vers=me.role==="cand"?"recruteur":"candidat";
+  b.innerHTML='<span aria-hidden="true">⇄</span><span class="sr">Passer côté '+vers+'</span>';
+  b.title="Passer côté "+vers;
+}
+async function switchSide(){
+  if(busy||!me)return;busy=true;
+  const nouveau=me.role==="cand"?"ent":"cand";
+  const {error}=await sb.from("profiles").update({role:nouveau}).eq("id",me.id);
+  busy=false;
+  if(error)return toast(error.message);
+  view="deck";toast(nouveau==="cand"?"Côté candidat":"Côté recruteur");
+  await refresh();scrollTo(0,0);
+}
 function incomplete(){return me && (me.role==="cand" ? !mine : !myOffer)}
 function banner(){
   if(!incomplete())return "";
@@ -133,6 +156,7 @@ function render(){
   tabs.hidden=!logged;
   lo.hidden=!session;
   tabs.querySelectorAll("button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===view?"page":"false"));
+  if(me)ensureSide(); else document.getElementById("mwSide")?.remove();
   if(view==="newpass")return newPass();
   if(view==="landing")landing();
   else if(view==="role")roleView();
@@ -256,7 +280,7 @@ function newPass(){
 
 function roleView(){
   app.innerHTML=`<h1 class="pagetitle">De quel côté es-tu ?</h1>
-  <p class="lead">Ce choix détermine ce que tu verras. Il reste modifiable en supprimant puis recréant ton profil.</p>
+  <p class="lead">Ce choix détermine ce que tu verras en premier. Tu pourras basculer d'un côté à l'autre quand tu veux, avec le bouton ⇄ en haut de l'écran, sans rien perdre.</p>
   <div class="choices">
     <button class="bigbtn primary" data-r="cand"><strong>Je cherche un poste</strong><span>Mon expérience parle avant mon état civil</span></button>
     <button class="bigbtn" data-r="ent"><strong>Je recrute</strong><span>Je découvre des parcours, pas des âges</span></button>
@@ -406,7 +430,7 @@ async function deck(){
         mine?sb.from("decisions").select("offer_id").eq("actor",me.id):Promise.resolve({data:[]})]);
       if(e1)throw e1;
       const vus=new Set((dec||[]).map(d=>d.offer_id));
-      const base=(offers||[]).filter(o=>!vus.has(o.id));
+      const base=(offers||[]).filter(o=>!vus.has(o.id)&&o.owner!==me.id);
       DECK=mine?base.map(o=>({o,s:fit(mine,o).total})).sort((a,b)=>b.s-a.s).map(x=>x.o)
                :base.sort((a,b)=>(b.updated_at||"").localeCompare(a.updated_at||""));
     }else{
