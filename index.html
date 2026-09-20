@@ -14,12 +14,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>(function(){try{var t=localStorage.getItem('mw-theme')||'auto';if(t!=='auto')document.documentElement.setAttribute('data-theme',t);
+var z=parseInt(localStorage.getItem('mw-zoom')||'17',10);if(z)document.documentElement.style.fontSize=z+'px';
+if(localStorage.getItem('mw-dys')==='1')document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('dys')});}catch(e){}})();</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="bar">
   <button class="logo" id="logo" aria-label="Accueil">
-    <svg viewBox="0 0 88 76" aria-hidden="true"><circle cx="24" cy="14" r="10.5" fill="var(--steel)"/><circle cx="64" cy="14" r="10.5" fill="var(--sawdust)"/><path d="M22 28 H30 A14 14 0 0 1 44 42 V44 A7 7 0 0 1 44 58 V60 A14 14 0 0 1 30 74 H22 A23 23 0 0 1 22 28 Z" fill="var(--steel)"/><path d="M69 28 H61 A14 14 0 0 0 47 42 V44 A7 7 0 0 1 47 58 V60 A14 14 0 0 0 61 74 H69 A23 23 0 0 0 69 28 Z" fill="var(--sawdust)"/></svg><span>Match<span class="o">Work</span></span>
+    <img src="logo-mark.svg" alt="" width="34" height="19"><span>Match<span class="o">Work</span></span>
   </button>
   <button class="linkbtn" id="logout" hidden>Se déconnecter</button>
 </header>
@@ -129,7 +134,7 @@ function render(){
 }
 
 /* ===================== Accueil et compte ===================== */
-function jointSvg(cls){return `<svg class="${cls}" viewBox="0 0 88 76" role="img" aria-label="Deux pièces qui s'emboîtent"><circle cx="24" cy="14" r="10.5" fill="var(--steel)"/><g class="right"><circle cx="64" cy="14" r="10.5" fill="var(--sawdust)"/><path d="M69 28 H61 A14 14 0 0 0 47 42 V44 A7 7 0 0 1 47 58 V60 A14 14 0 0 0 61 74 H69 A23 23 0 0 0 69 28 Z" fill="var(--sawdust)"/></g><path d="M22 28 H30 A14 14 0 0 1 44 42 V44 A7 7 0 0 1 44 58 V60 A14 14 0 0 1 30 74 H22 A23 23 0 0 1 22 28 Z" fill="var(--steel)"/></svg>`}
+function jointSvg(cls){return `<img src="logo.svg" class="${cls}" alt="MatchWork">`}
 function lockIcon(){return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>`}
 
 function landing(){
@@ -524,5 +529,6 @@ document.addEventListener("keydown",e=>{
 });
 boot();
 </script>
+<script src="a11y.js"></script>
 </body>
 </html>

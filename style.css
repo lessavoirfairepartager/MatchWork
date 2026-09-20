@@ -18,9 +18,9 @@
     --dim1:#6BA6E8;--dim2:#FF8534;--dim3:#84B8EA;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+html{height:100%;font-size:17px;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
-  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.5}
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:1rem;line-height:1.5}
 h1,h2,h3,h4{font-family:"Nunito","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.12;margin:0}
 a{color:var(--steel)}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -30,7 +30,7 @@ code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:.9em}
 .wrap{max-width:600px;margin:0 auto;padding:0 18px 116px}
 header.bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;max-width:640px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;font-family:"Nunito",sans-serif;font-weight:800;font-size:1.3rem;letter-spacing:-.02em;background:none;border:0;padding:0;cursor:pointer;color:var(--steel)}
-.logo svg{width:30px;height:26px;flex:none}
+.logo svg,.logo img{width:auto;height:26px;flex:none}
 .logo .o{color:var(--sawdust)}
 .linkbtn{background:none;border:0;color:var(--steel);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 0;font-size:.95rem}
 .foot{text-align:center;color:var(--muted);font-size:.85rem;padding:0 18px 92px;max-width:640px;margin:0 auto}
@@ -160,11 +160,11 @@ nav.tabs button[aria-current="page"]{color:var(--steel)}
 .modal .box{background:var(--card);border-radius:18px;padding:26px 22px;max-width:400px;width:100%;text-align:center}
 .modal h2{font-size:1.9rem;font-weight:800;margin:6px 0 8px}
 .modal p{color:var(--muted);margin:0 0 18px}
-.fit{width:170px;height:auto;display:block;margin:0 auto}
-.fit .right{animation:slide 1s cubic-bezier(.2,.8,.2,1) .15s both;transform-origin:center}
-@keyframes slide{from{transform:translateX(34px)}to{transform:translateX(0)}}
+.fit{width:180px;height:auto;display:block;margin:0 auto;animation:pop .5s cubic-bezier(.2,1.4,.4,1) both}
+
+@keyframes pop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:.92rem;z-index:60;max-width:90vw;text-align:center}
-@media (prefers-reduced-motion: reduce){.fit .right{animation:none}.card.fly{transition:none}}
+@media (prefers-reduced-motion: reduce){.fit{animation:none}.card.fly{transition:none}}
 
 /* Pages légales */
 .legal{max-width:680px;margin:0 auto;padding:10px 18px 60px}
@@ -173,3 +173,28 @@ nav.tabs button[aria-current="page"]{color:var(--steel)}
 .legal p,.legal li{color:var(--ink)}
 .legal .maj{color:var(--muted);font-size:.9rem}
 .legal .todo{background:var(--chip);border-left:4px solid var(--sawdust);padding:10px 14px;margin:14px 0;font-size:.92rem}
+
+
+/* ---- Barre affichage et accessibilité ---- */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+header.bar{gap:10px}
+.tools{position:relative;margin-left:auto}
+.toolbtn{width:40px;height:40px;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--card);color:var(--steel);border-radius:12px;cursor:pointer}
+.toolbtn[aria-expanded="true"]{border-color:var(--steel)}
+.panel{position:absolute;right:0;top:48px;width:250px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;z-index:40;box-shadow:0 10px 30px rgba(9,20,33,.18)}
+.panel .plab{margin:0 0 6px;font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.panel .seg{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:11px;margin-bottom:14px}
+.panel .seg button{flex:1;padding:8px 4px;border:0;background:none;border-radius:8px;font-size:.9rem;font-weight:700;color:var(--muted);cursor:pointer}
+.panel .seg button[aria-pressed="true"]{background:var(--card);color:var(--steel);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.panel .zoom{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.panel .zoom button{width:44px;height:40px;border:1.5px solid var(--line);background:var(--card);border-radius:10px;font-weight:800;cursor:pointer;color:var(--steel)}
+.panel .zoom output{flex:1;text-align:center;font-weight:700;font-size:.92rem}
+.panel .install{width:100%;padding:11px;border:0;border-radius:11px;background:var(--sawdust);color:#fff;font-weight:700;cursor:pointer}
+.panel .phint{margin:10px 0 0;font-size:.82rem;color:var(--muted)}
+
+/* ---- Mode dys ---- */
+body.dys{font-family:"Atkinson Hyperlegible",system-ui,sans-serif;letter-spacing:.045em;word-spacing:.18em;line-height:1.85}
+body.dys h1,body.dys h2,body.dys h3,body.dys h4,body.dys .logo,body.dys legend,body.dys .card h2{font-family:"Atkinson Hyperlegible",system-ui,sans-serif;letter-spacing:.02em;line-height:1.35}
+body.dys p,body.dys li{max-width:62ch;text-align:left}
+body.dys .lead,body.dys .small,body.dys .dimhint{line-height:1.8}
+body.dys .tag,body.dys .chip{letter-spacing:.02em}
