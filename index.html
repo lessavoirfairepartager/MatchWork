@@ -98,7 +98,7 @@ function boot(){
     app.innerHTML=`<h1 class="pagetitle">Configuration à terminer</h1>
     <p class="lead">Ouvre le fichier <code>config.js</code> et renseigne l'URL de ton projet Supabase et la clé publique <code>anon</code>. Le fichier <code>supabase/schema.sql</code> est à exécuter une fois dans l'éditeur SQL de Supabase.</p>`;return}
   sb=window.supabase.createClient(MW_CONFIG.url,MW_CONFIG.key);
-  sb.auth.onAuthStateChange((_e,s)=>{session=s;refresh()});
+  sb.auth.onAuthStateChange((ev,s)=>{session=s;if(ev==="PASSWORD_RECOVERY"){view="newpass";return render()}refresh()});
   sb.auth.getSession().then(({data})=>{session=data.session;refresh()});
 }
 async function refresh(){
@@ -112,20 +112,28 @@ async function refresh(){
       sb.from("cand_public").select("*").eq("id",me.id).maybeSingle(),
       sb.from("cand_private").select("*").eq("id",me.id).maybeSingle()]);
     mine=pub?{...pub,...(priv||{})}:null;
-    if(!mine){view="setup"}else if(!["deck","matches","profile"].includes(view))view="deck";
+    if(!["deck","matches","profile","setup"].includes(view))view="deck";
   }else{
     const {data:o}=await sb.from("offers").select("*").eq("owner",me.id).order("updated_at",{ascending:false}).limit(1);
     myOffer=o&&o[0]?o[0]:null;
     if(myOffer){const {data:op}=await sb.from("offer_private").select("*").eq("offer_id",myOffer.id).maybeSingle();myOffer.contact=op?.contact||""}
-    if(!myOffer){view="setup"}else if(!["deck","matches","profile"].includes(view))view="deck";
+    if(!["deck","matches","profile","setup"].includes(view))view="deck";
   }
   render();
 }
+function incomplete(){return me && (me.role==="cand" ? !mine : !myOffer)}
+function banner(){
+  if(!incomplete())return "";
+  return `<div class="notice"><p><b>Ton profil n'est pas encore rempli.</b> Tu peux regarder librement, mais personne ne te voit et tu ne peux pas encore te signaler.</p>
+  <button class="ghost" id="bnGo">${me.role==="cand"?"Créer mon profil":"Publier mon offre"}</button></div>`;
+}
+function wireBanner(){const b=document.getElementById("bnGo");if(b)b.onclick=()=>{view="profile";render();scrollTo(0,0)}}
 function render(){
-  const logged=!!session&&!!me&&(mine||myOffer);
-  tabs.hidden=!logged||view==="setup";
+  const logged=!!session&&!!me;
+  tabs.hidden=!logged;
   lo.hidden=!session;
   tabs.querySelectorAll("button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===view?"page":"false"));
+  if(view==="newpass")return newPass();
   if(view==="landing")landing();
   else if(view==="role")roleView();
   else if(view==="setup"||view==="profile")setup();
@@ -153,10 +161,11 @@ function landing(){
         <button id="tUp" role="tab" aria-selected="false">Créer un compte</button>
       </div>
       <form class="pf" id="auth">
-        <label class="f">Adresse e-mail<input type="email" name="email" required autocomplete="email"></label>
-        <label class="f">Mot de passe<input type="password" name="password" required minlength="8" autocomplete="current-password"><small>8 caractères minimum.</small></label>
+        <label class="f">Adresse e-mail<input type="email" name="email" required autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false"></label>
+        <label class="f">Mot de passe<input type="password" name="password" required minlength="8" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false"><small>8 caractères minimum.</small></label>
         <label class="check" id="consentWrap" hidden><input type="checkbox" name="consent"><span>J'ai lu et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>. J'autorise MatchWork à enregistrer les informations que je saisis pour me mettre en relation.</span></label>
         <button class="submit" id="authBtn">Se connecter</button>
+        <button type="button" class="linkbtn" id="forgot">Mot de passe oublié ?</button>
       </form>
       <p class="small" style="margin-top:10px">Aucune donnée sensible ne doit être saisie : ni santé, ni origine, ni opinion, ni situation familiale.</p>
     </div>
@@ -174,16 +183,74 @@ function landing(){
     e.preventDefault();if(busy)return;busy=true;
     const f=Object.fromEntries(new FormData(e.target));
     try{
+      const mail=(f.email||"").trim().toLowerCase();
       if(mode==="up"){
         if(!f.consent){toast("Il faut accepter la politique de confidentialité.");return}
-        const {data,error}=await sb.auth.signUp({email:f.email,password:f.password});
+        const {data,error}=await sb.auth.signUp({email:mail,password:f.password});
         if(error)throw error;
         if(!data.session)toast("Compte créé : confirme ton adresse par e-mail, puis connecte-toi.");
       }else{
-        const {error}=await sb.auth.signInWithPassword({email:f.email,password:f.password});
+        const {error}=await sb.auth.signInWithPassword({email:mail,password:f.password});
         if(error)throw error;
       }
-    }catch(err){toast(err.message||"Connexion impossible.")}finally{busy=false}
+    }catch(err){toast(authErr(err))}finally{busy=false}
+  };
+  wirePw();
+  document.getElementById("forgot").onclick=async()=>{
+    const mail=(app.querySelector('[name="email"]').value||"").trim().toLowerCase();
+    if(!mail)return toast("Saisis d'abord ton adresse e-mail, puis reclique.");
+    const {error}=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname});
+    toast(error?authErr(error):"Si un compte existe, un lien de réinitialisation vient de partir.");
+  };
+}
+/* Petit œil pour afficher le mot de passe saisi */
+const EYE='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="2.6"/></svg>';
+const EYEOFF='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-6 10-6c2 0 3.7.6 5.1 1.4M22 12s-3.6 6-10 6c-2 0-3.7-.6-5.1-1.4"/><path d="M4 4l16 16"/></svg>';
+function wirePw(){
+  app.querySelectorAll('input[type="password"]').forEach(inp=>{
+    if(inp.closest(".pwwrap"))return;
+    const w=document.createElement("span");w.className="pwwrap";
+    inp.parentNode.insertBefore(w,inp);w.appendChild(inp);
+    const b=document.createElement("button");b.type="button";b.className="pweye";
+    b.setAttribute("aria-label","Afficher le mot de passe");b.setAttribute("aria-pressed","false");
+    b.innerHTML=EYE;
+    b.onclick=()=>{
+      const montrer=inp.type==="password";
+      inp.type=montrer?"text":"password";
+      b.innerHTML=montrer?EYEOFF:EYE;
+      b.setAttribute("aria-pressed",String(montrer));
+      b.setAttribute("aria-label",montrer?"Masquer le mot de passe":"Afficher le mot de passe");
+      inp.focus();
+    };
+    w.appendChild(b);
+  });
+}
+
+function authErr(e){
+  const m=(e&&e.message||"").toLowerCase();
+  if(m.includes("invalid login"))return "Adresse ou mot de passe incorrect. Le mot de passe distingue les majuscules.";
+  if(m.includes("email not confirmed"))return "Adresse pas encore confirmée : ouvre le lien reçu par e-mail.";
+  if(m.includes("already registered")||m.includes("already been registered"))return "Un compte existe déjà avec cette adresse : connecte-toi ou réinitialise le mot de passe.";
+  if(m.includes("rate limit")||m.includes("too many"))return "Trop de tentatives. Réessaie dans quelques minutes.";
+  if(m.includes("password"))return "Mot de passe trop court : 8 caractères minimum.";
+  return e&&e.message||"Connexion impossible.";
+}
+
+/* Nouveau mot de passe après clic sur le lien de réinitialisation */
+function newPass(){
+  app.innerHTML=`<h1 class="pagetitle">Nouveau mot de passe</h1>
+  <p class="lead">Choisis un mot de passe, tu resteras connecté ensuite.</p>
+  <form class="pf" id="np">
+    <label class="f">Nouveau mot de passe<input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+    <button class="submit">Enregistrer</button>
+  </form>`;
+  wirePw();
+  document.getElementById("np").onsubmit=async e=>{
+    e.preventDefault();
+    const pw=new FormData(e.target).get("password");
+    const {error}=await sb.auth.updateUser({password:pw});
+    if(error)return toast(authErr(error));
+    toast("Mot de passe modifié.");view="deck";refresh();
   };
 }
 
@@ -328,26 +395,32 @@ async function onSave(e){
 }
 
 /* ===================== Découvrir ===================== */
-let DECK=[];
+let DECK=[],DECK_REF={savoirs:[],sf:[],se:{},moteurs:{}};
 async function deck(){
   app.innerHTML=`<p class="lead" style="padding:20px 0">Chargement…</p>`;
+  const vide={savoirs:[],sf:[],se:{},moteurs:{}};
   try{
     if(me.role==="cand"){
       const [{data:offers,error:e1},{data:dec}]=await Promise.all([
         sb.from("offers").select("*").eq("active",true),
-        sb.from("decisions").select("offer_id").eq("actor",me.id)]);
+        mine?sb.from("decisions").select("offer_id").eq("actor",me.id):Promise.resolve({data:[]})]);
       if(e1)throw e1;
       const vus=new Set((dec||[]).map(d=>d.offer_id));
-      DECK=(offers||[]).filter(o=>!vus.has(o.id)).map(o=>({o,s:fit(mine,o).total})).sort((a,b)=>b.s-a.s).map(x=>x.o);
+      const base=(offers||[]).filter(o=>!vus.has(o.id));
+      DECK=mine?base.map(o=>({o,s:fit(mine,o).total})).sort((a,b)=>b.s-a.s).map(x=>x.o)
+               :base.sort((a,b)=>(b.updated_at||"").localeCompare(a.updated_at||""));
     }else{
       const [{data:cands,error:e1},{data:dec}]=await Promise.all([
         sb.from("cand_public").select("*").eq("active",true).neq("id",me.id),
-        sb.from("decisions").select("cand_id").eq("actor",me.id)]);
+        myOffer?sb.from("decisions").select("cand_id").eq("actor",me.id):Promise.resolve({data:[]})]);
       if(e1)throw e1;
       const vus=new Set((dec||[]).map(d=>d.cand_id));
-      DECK=(cands||[]).filter(c=>!vus.has(c.id)).map(c=>({c,s:fit(c,myOffer).total})).sort((a,b)=>b.s-a.s).map(x=>x.c);
+      const base=(cands||[]).filter(c=>!vus.has(c.id));
+      DECK=myOffer?base.map(c=>({c,s:fit(c,myOffer).total})).sort((a,b)=>b.s-a.s).map(x=>x.c)
+                  :base.sort((a,b)=>(b.updated_at||"").localeCompare(a.updated_at||""));
     }
   }catch(err){app.innerHTML=`<div class="empty"><h2>Chargement impossible</h2><p>${esc(err.message||"")}</p></div>`;return}
+  DECK_REF=me.role==="cand"?(mine||vide):(myOffer||vide);
   drawDeck();
 }
 function fitBox(d,label){
@@ -359,14 +432,14 @@ function barList(defs,vals,ref){
   return `<div class="bars">${defs.map(([k,label])=>{const v=Number(vals?.[k]||0);const r=ref?Number(ref[k]||0):null;
     return `<div class="bar"><span>${esc(label)}</span><div class="bt"><i style="width:${v*10}%"></i>${r!==null?`<u style="left:${r*10}%"></u>`:""}</div><b>${v}</b></div>`}).join("")}</div>`}
 
-function cardCand(c,off){
-  const d=fit(c,off);
+function cardCand(c,off,blind){
+  const d=blind?null:fit(c,off);
   return `<article class="card top" data-id="${c.id}">
     <span class="stamp yes">Intéressé</span><span class="stamp no">Passer</span>
     <div class="code">Profil ${code(c.id)}</div>
     <h2>${esc(c.metier)}</h2>
     <div class="meta"><span>${esc(c.exp)} ans de métier</span><span>${esc(c.ville||"")}${c.mobilite?" + "+esc(c.mobilite)+" km":""}</span><span>${esc(c.contrat||"")}</span></div>
-    ${fitBox(d,"Compatibilité avec ton offre")}
+    ${blind?"":fitBox(d,"Compatibilité avec ton offre")}
     ${DIMS.map(([k,n,col])=>`<h3 style="--dim:${col}">${n}</h3><div>${tagList(c[k],off[k])}</div>`).join("")}
     <h3 style="--dim:var(--dim3)">Savoir-être <span class="small">(le trait marque ton attente)</span></h3>${barList(SE,c.se,off.se)}
     <h3 style="--dim:var(--sawdust)">Ce qui le fait avancer</h3>${barList(MOT,c.moteurs,off.moteurs)}
@@ -374,14 +447,14 @@ function cardCand(c,off){
     ${c.bienfait?`<h3 style="--dim:var(--sawdust)">Le travail bien fait, pour lui</h3><p class="quote">${esc(c.bienfait)}</p>`:""}
     <div class="masked">${lockIcon()}<span>Nom, âge et coordonnées restent sur le serveur, hors de portée, jusqu'au match.</span></div>
   </article>`}
-function cardOffer(o,c){
-  const d=fit(c,o);
+function cardOffer(o,c,blind){
+  const d=blind?null:fit(c,o);
   return `<article class="card top" data-id="${o.id}">
     <span class="stamp yes">Intéressé</span><span class="stamp no">Passer</span>
     <div class="code">${esc(o.ent)}${o.taille?", "+esc(o.taille):""}</div>
     <h2>${esc(o.poste)}</h2>
     <div class="meta"><span>${esc(o.ville||"")}</span><span>${esc(o.contrat||"")}</span><span>${esc(o.salaire||"")}</span></div>
-    ${fitBox(d,"Ton profil couvre")}
+    ${blind?"":fitBox(d,"Ton profil couvre")}
     ${DIMS.map(([k,n,col])=>`<h3 style="--dim:${col}">${n} attendus</h3><div>${tagList(o[k],c[k])}</div>`).join("")}
     <h3 style="--dim:var(--dim3)">Savoir-être recherchés <span class="small">(le trait marque ton niveau)</span></h3>${barList(SE,o.se,c.se)}
     <h3 style="--dim:var(--sawdust)">Ce que le poste offre</h3>${barList(MOT,o.moteurs,c.moteurs)}
@@ -392,11 +465,12 @@ function cardOffer(o,c){
 
 function drawDeck(){
   if(!DECK.length){
-    app.innerHTML=`<div class="empty"><h2>Rien de nouveau</h2><p>Tu as parcouru tout ce qui est disponible. Repasse plus tard : de nouveaux ${me.role==="cand"?"postes":"profils"} arrivent au fil des inscriptions.</p><button class="ghost" id="rl">Recharger</button></div>`;
-    document.getElementById("rl").onclick=deck;return}
+    app.innerHTML=banner()+`<div class="empty"><h2>Rien de nouveau</h2><p>Tu as parcouru tout ce qui est disponible. Repasse plus tard : de nouveaux ${me.role==="cand"?"postes":"profils"} arrivent au fil des inscriptions.</p><button class="ghost" id="rl">Recharger</button></div>`;
+    document.getElementById("rl").onclick=deck;wireBanner();return}
   const top=DECK[0],next=DECK[1];
-  const mk=x=>me.role==="cand"?cardOffer(x,mine):cardCand(x,myOffer);
-  app.innerHTML=`<p class="lead" style="margin:4px 0 8px">${DECK.length} ${me.role==="cand"?"offre":"profil"}${DECK.length>1?"s":""} à découvrir</p>
+  const blind=incomplete();
+  const mk=x=>me.role==="cand"?cardOffer(x,DECK_REF,blind):cardCand(x,DECK_REF,blind);
+  app.innerHTML=banner()+`<p class="lead" style="margin:4px 0 8px">${DECK.length} ${me.role==="cand"?"offre":"profil"}${DECK.length>1?"s":""} à découvrir</p>
   <div class="deck">${next?mk(next).replace('class="card top"','class="card under" aria-hidden="true"'):""}${mk(top)}</div>
   <div class="actions"><button class="act" id="no">Passer</button><button class="act yes" id="yes">Intéressé</button></div>
   <p class="hint">Glisse la carte ou utilise les flèches du clavier.</p>`;
@@ -411,6 +485,7 @@ function drawDeck(){
   card.addEventListener("pointerup",end);card.addEventListener("pointercancel",end);
   document.getElementById("yes").onclick=()=>fling(card,top,true);
   document.getElementById("no").onclick=()=>fling(card,top,false);
+  wireBanner();
 }
 function fling(card,item,like){
   card.classList.add("fly");card.style.transform=`translateX(${like?600:-600}px) rotate(${like?25:-25}deg)`;card.style.opacity=0;
@@ -418,6 +493,10 @@ function fling(card,item,like){
 }
 async function decide(item,like){
   DECK=DECK.slice(1);drawDeck();
+  if(incomplete()){
+    if(like){toast(me.role==="cand"?"Crée ton profil pour te signaler à cette entreprise.":"Publie ton offre pour contacter ce profil.");view="profile";render();scrollTo(0,0)}
+    return;
+  }
   const candId=me.role==="cand"?me.id:item.id;
   const offerId=me.role==="cand"?item.id:myOffer.id;
   const {error}=await sb.from("decisions").insert({actor:me.id,cand_id:candId,offer_id:offerId,liked:like});
@@ -445,8 +524,8 @@ async function matches(){
   const {data:ms,error}=await sb.from("matches").select("*").order("created_at",{ascending:false});
   if(error)return app.innerHTML=`<div class="empty"><h2>Chargement impossible</h2><p>${esc(error.message)}</p></div>`;
   if(!ms||!ms.length){
-    app.innerHTML=`<div class="empty"><h2>Pas encore de match</h2><p>Un match apparaît quand l'intérêt est réciproque. Continue à découvrir ${me.role==="cand"?"les offres":"les profils"}.</p><button class="ghost" id="go">Découvrir</button></div>`;
-    document.getElementById("go").onclick=()=>{view="deck";render()};return}
+    app.innerHTML=banner()+`<div class="empty"><h2>Pas encore de match</h2><p>Un match apparaît quand l'intérêt est réciproque. Continue à découvrir ${me.role==="cand"?"les offres":"les profils"}.</p><button class="ghost" id="go">Découvrir</button></div>`;
+    document.getElementById("go").onclick=()=>{view="deck";render()};wireBanner();return}
   const ids=ms.map(m=>m.id);
   const {data:msgs}=await sb.from("messages").select("*").in("match_id",ids).order("created_at");
   let heads={};

@@ -194,6 +194,17 @@ header.bar{gap:10px}
   .pill{width:31px;height:31px;font-size:.95rem}
 }
 
+/* ---- Afficher le mot de passe ---- */
+.pwwrap{position:relative;display:block}
+.pwwrap input{padding-right:48px}
+.pweye{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:38px;height:38px;display:grid;place-items:center;border:0;background:none;color:var(--muted);cursor:pointer;border-radius:10px}
+.pweye:hover{background:var(--chip);color:var(--steel)}
+.pweye[aria-pressed="true"]{color:var(--steel)}
+
+/* ---- Bandeau profil incomplet ---- */
+.notice{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;background:var(--card);border:1.5px solid var(--sawdust);border-left-width:5px;border-radius:14px;padding:12px 14px;margin:6px 0 12px}
+.notice p{margin:0;font-size:.92rem;flex:1 1 220px}
+
 /* ---- Mode dys ---- */
 body.dys{font-family:"Atkinson Hyperlegible",system-ui,sans-serif;letter-spacing:.045em;word-spacing:.18em;line-height:1.85}
 body.dys h1,body.dys h2,body.dys h3,body.dys h4,body.dys .logo,body.dys legend,body.dys .card h2{font-family:"Atkinson Hyperlegible",system-ui,sans-serif;letter-spacing:.02em;line-height:1.35}

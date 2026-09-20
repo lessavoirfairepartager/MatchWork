@@ -3,7 +3,7 @@
    Les appels à Supabase ne sont jamais mis en cache : des données
    de profil périmées n'auraient aucun sens, et rien ne doit traîner
    dans le cache du navigateur. */
-const CACHE = "matchwork-v1";
+const CACHE = "matchwork-v2";
 const SHELL = [
   "./", "./index.html", "./style.css", "./a11y.js", "./config.js",
   "./logo.svg", "./logo-mark.svg", "./icon-192.png",
