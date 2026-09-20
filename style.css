@@ -175,22 +175,24 @@ nav.tabs button[aria-current="page"]{color:var(--steel)}
 .legal .todo{background:var(--chip);border-left:4px solid var(--sawdust);padding:10px 14px;margin:14px 0;font-size:.92rem}
 
 
-/* ---- Barre affichage et accessibilité ---- */
+
+/* ---- Barre d'affichage (pastilles, en haut à droite) ---- */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 header.bar{gap:10px}
-.tools{position:relative;margin-left:auto}
-.toolbtn{width:40px;height:40px;display:grid;place-items:center;border:1.5px solid var(--line);background:var(--card);color:var(--steel);border-radius:12px;cursor:pointer}
-.toolbtn[aria-expanded="true"]{border-color:var(--steel)}
-.panel{position:absolute;right:0;top:48px;width:250px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;z-index:40;box-shadow:0 10px 30px rgba(9,20,33,.18)}
-.panel .plab{margin:0 0 6px;font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.panel .seg{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:11px;margin-bottom:14px}
-.panel .seg button{flex:1;padding:8px 4px;border:0;background:none;border-radius:8px;font-size:.9rem;font-weight:700;color:var(--muted);cursor:pointer}
-.panel .seg button[aria-pressed="true"]{background:var(--card);color:var(--steel);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.panel .zoom{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.panel .zoom button{width:44px;height:40px;border:1.5px solid var(--line);background:var(--card);border-radius:10px;font-weight:800;cursor:pointer;color:var(--steel)}
-.panel .zoom output{flex:1;text-align:center;font-weight:700;font-size:.92rem}
-.panel .install{width:100%;padding:11px;border:0;border-radius:11px;background:var(--sawdust);color:#fff;font-weight:700;cursor:pointer}
-.panel .phint{margin:10px 0 0;font-size:.82rem;color:var(--muted)}
+.tools{margin-left:auto;display:flex;align-items:center;gap:4px;padding:4px;border:1.5px solid var(--line);border-radius:999px;background:var(--card)}
+.pill{width:34px;height:34px;flex:none;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:var(--steel);font-size:1rem;line-height:1;cursor:pointer;text-decoration:none;padding:0}
+.pill.txt{font-family:"Nunito",sans-serif;font-weight:800;font-size:.95rem}
+.pill[hidden]{display:none}
+.tools{position:relative}
+.bubble{position:absolute;right:0;top:48px;width:260px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px;z-index:40;box-shadow:0 10px 30px rgba(9,20,33,.18);text-align:left}
+.bubble p{margin:0 0 10px;font-size:.92rem;line-height:1.5}
+.bubble button{padding:8px 14px;border:1.5px solid var(--steel);background:none;color:var(--steel);border-radius:10px;font-weight:700;cursor:pointer}
+.pill:hover{background:var(--chip)}
+.pill[aria-pressed="true"]{background:var(--steel);color:#fff}
+@media (max-width:420px){
+  .logo span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .pill{width:31px;height:31px;font-size:.95rem}
+}
 
 /* ---- Mode dys ---- */
 body.dys{font-family:"Atkinson Hyperlegible",system-ui,sans-serif;letter-spacing:.045em;word-spacing:.18em;line-height:1.85}
