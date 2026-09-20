@@ -3,19 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2F5266">
+<meta name="theme-color" content="#013B79">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<meta property="og:title" content="MatchWork — le métier d'abord">
+<meta property="og:description" content="Matching emploi anonymisé : savoirs, savoir-faire, savoir-être. L'identité se dévoile au match.">
+<meta property="og:image" content="logo.png">
+<meta property="og:type" content="website">
 <meta name="description" content="MatchWork — matching emploi anonymisé : savoirs, savoir-faire, savoir-être. Le métier d'abord, l'identité après le match.">
 <title>MatchWork — le métier d'abord</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="bar">
   <button class="logo" id="logo" aria-label="Accueil">
-    <svg viewBox="0 0 30 22" aria-hidden="true"><path d="M0 2h12v6h5v6h-5v6H0z" fill="var(--steel)"/><path d="M30 2H19v6h-2v6h2v6h11z" fill="var(--sawdust)"/></svg>
-    MatchWork
+    <svg viewBox="0 0 88 76" aria-hidden="true"><circle cx="24" cy="14" r="10.5" fill="var(--steel)"/><circle cx="64" cy="14" r="10.5" fill="var(--sawdust)"/><path d="M22 28 H30 A14 14 0 0 1 44 42 V44 A7 7 0 0 1 44 58 V60 A14 14 0 0 1 30 74 H22 A23 23 0 0 1 22 28 Z" fill="var(--steel)"/><path d="M69 28 H61 A14 14 0 0 0 47 42 V44 A7 7 0 0 1 47 58 V60 A14 14 0 0 0 61 74 H69 A23 23 0 0 0 69 28 Z" fill="var(--sawdust)"/></svg><span>Match<span class="o">Work</span></span>
   </button>
   <button class="linkbtn" id="logout" hidden>Se déconnecter</button>
 </header>
@@ -125,7 +129,7 @@ function render(){
 }
 
 /* ===================== Accueil et compte ===================== */
-function jointSvg(cls){return `<svg class="${cls}" viewBox="0 0 220 90" role="img" aria-label="Un tenon qui s'emboîte dans une mortaise"><g class="left"><path d="M10 10h80v24h34v22H90v24H10z" fill="var(--steel)"/></g><path d="M210 10h-86v24h0v22h0v24h86z" fill="var(--sawdust)"/></svg>`}
+function jointSvg(cls){return `<svg class="${cls}" viewBox="0 0 88 76" role="img" aria-label="Deux pièces qui s'emboîtent"><circle cx="24" cy="14" r="10.5" fill="var(--steel)"/><g class="right"><circle cx="64" cy="14" r="10.5" fill="var(--sawdust)"/><path d="M69 28 H61 A14 14 0 0 0 47 42 V44 A7 7 0 0 1 47 58 V60 A14 14 0 0 0 61 74 H69 A23 23 0 0 0 69 28 Z" fill="var(--sawdust)"/></g><path d="M22 28 H30 A14 14 0 0 1 44 42 V44 A7 7 0 0 1 44 58 V60 A14 14 0 0 1 30 74 H22 A23 23 0 0 1 22 28 Z" fill="var(--steel)"/></svg>`}
 function lockIcon(){return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>`}
 
 function landing(){
