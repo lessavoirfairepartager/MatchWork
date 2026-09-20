@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2F5266">
+<meta name="description" content="MatchWork — matching emploi anonymisé : savoirs, savoir-faire, savoir-être. Le métier d'abord, l'identité après le match.">
+<title>MatchWork — le métier d'abord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5F1;--ink:#1F2B33;--steel:#2F5266;--sawdust:#E3B23C;--pine:#3E6B4F;--rust:#A6452E;
+  --line:#D3D8D0;--card:#FFFFFF;--muted:#56646B;--chip:#E8ECE6;
+  --dim1:#2F5266;--dim2:#3E6B4F;--dim3:#A6452E;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#131A1F;--ink:#E7ECEA;--steel:#86AFC5;--sawdust:#E9C25A;--pine:#7DAE8E;--rust:#E2826A;
+    --line:#2B3740;--card:#1B242B;--muted:#9EABB1;--chip:#243039;
+    --dim1:#86AFC5;--dim2:#7DAE8E;--dim3:#E2826A;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131A1F;--ink:#E7ECEA;--steel:#86AFC5;--sawdust:#E9C25A;--pine:#7DAE8E;--rust:#E2826A;
+  --line:#2B3740;--card:#1B242B;--muted:#9EABB1;--chip:#243039;
+  --dim1:#86AFC5;--dim2:#7DAE8E;--dim3:#E2826A;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.5}
+h1,h2,h3,h4{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.12;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sawdust);outline-offset:2px}
+.wrap{max-width:600px;margin:0 auto;padding:0 18px 116px}
+@media(min-width:900px){.wrap{max-width:640px}}
+header.bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;max-width:640px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:10px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:-.01em;background:none;border:0;padding:0;cursor:pointer}
+.logo svg{width:30px;height:22px}
+.linkbtn{background:none;border:0;color:var(--steel);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 0;font-size:.95rem}
+
+/* ---------- Accueil ---------- */
+.hero{padding:26px 0 8px}
+.hero h1{font-size:clamp(2.2rem,8.5vw,3.3rem);font-weight:800;letter-spacing:-.025em;max-width:14ch}
+.hero p{color:var(--muted);max-width:42ch;margin:16px 0 24px;font-size:1.05rem}
+.joint{display:block;width:100%;max-width:340px;height:auto;margin:8px 0 24px}
+.choices{display:grid;gap:12px}
+@media(min-width:560px){.choices{grid-template-columns:1fr 1fr}}
+.bigbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:18px 20px;border-radius:14px;border:2px solid var(--ink);background:var(--card);cursor:pointer}
+.bigbtn strong{font-family:"Bricolage Grotesque",sans-serif;font-size:1.22rem}
+.bigbtn span{color:var(--muted);font-size:.95rem}
+.bigbtn.primary{background:var(--steel);border-color:var(--steel);color:#fff}
+.bigbtn.primary span{color:rgba(255,255,255,.86)}
+.triad{margin:34px 0 0;display:grid;gap:12px}
+@media(min-width:560px){.triad{grid-template-columns:repeat(3,1fr)}}
+.triad div{border-top:4px solid var(--dim);padding:10px 2px 0}
+.triad b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.05rem}
+.triad span{display:block;color:var(--muted);font-size:.92rem;margin-top:2px}
+.steps{margin:36px 0 0;padding:0;list-style:none;display:grid;gap:16px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:12px;counter-increment:s}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--sawdust);color:#1F2B33;font-weight:700}
+.steps b{display:block}
+.steps span{color:var(--muted);font-size:.95rem}
+.demo-note{margin-top:28px;padding:12px 14px;border-left:4px solid var(--sawdust);background:var(--card);font-size:.9rem;color:var(--muted)}
+
+/* ---------- Liste d'attente (Netlify Forms) ---------- */
+.waitlist{margin-top:38px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:20px}
+.waitlist h2{font-size:1.35rem;font-weight:800;margin-bottom:4px}
+.waitlist p{color:var(--muted);font-size:.95rem;margin:0 0 14px}
+.waitlist form{display:grid;gap:10px}
+.waitlist .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+
+/* ---------- Formulaires ---------- */
+.pagetitle{font-size:1.75rem;font-weight:800;margin:10px 0 6px;letter-spacing:-.015em}
+.lead{color:var(--muted);margin:0 0 18px}
+form.pf{display:grid;gap:18px}
+label.f{display:grid;gap:6px;font-weight:700;font-size:.95rem}
+label.f small{font-weight:400;color:var(--muted)}
+input[type=text],input[type=number],input[type=email],select,textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card)}
+textarea{min-height:74px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+fieldset{border:0;padding:0;margin:0}
+fieldset.dim{border-left:4px solid var(--dim);padding-left:12px}
+legend{font-weight:700;font-size:1rem;font-family:"Bricolage Grotesque",sans-serif;margin-bottom:2px}
+.dimhint{color:var(--muted);font-size:.9rem;margin:0 0 8px}
+.private{border:1.5px dashed var(--line);border-radius:12px;padding:14px;display:grid;gap:12px}
+.private-h{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:.92rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.addchip{display:flex;gap:8px;margin-top:8px}
+.addchip input{flex:1;padding:8px 12px}
+.addchip button{padding:8px 14px;border-radius:10px;border:1.5px solid var(--steel);background:none;color:var(--steel);font-weight:700;cursor:pointer}
+.submit{padding:15px;border-radius:12px;border:0;background:var(--steel);color:#fff;font-weight:700;font-size:1.05rem;cursor:pointer}
+.ghost{padding:10px 16px;border-radius:10px;border:1.5px solid var(--steel);background:none;color:var(--steel);font-weight:700;cursor:pointer}
+.toolrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+
+/* ---------- Cartes ---------- */
+.deck{position:relative;height:min(600px,calc(100dvh - 300px));min-height:460px;margin-top:6px}
+.card{position:absolute;inset:0;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:22px 20px;overflow:auto;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.card.top{cursor:grab;z-index:2}
+.card.under{transform:scale(.96) translateY(12px);opacity:.7;z-index:1}
+.card.fly{transition:transform .35s ease,opacity .35s ease}
+.card .code{font-family:"Bricolage Grotesque",sans-serif;font-size:.9rem;color:var(--muted)}
+.card h2{font-size:1.6rem;font-weight:800;margin:4px 0 8px;letter-spacing:-.015em}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--muted);font-size:.95rem;margin-bottom:12px}
+.fitbox{display:grid;gap:7px;margin:0 0 14px;padding:12px;border-radius:12px;background:var(--chip)}
+.fitbox .frow{display:grid;grid-template-columns:96px 1fr 44px;align-items:center;gap:10px;font-size:.88rem}
+.fitbox .gauge{height:7px;background:var(--card);border-radius:4px;overflow:hidden}
+.fitbox .gauge i{display:block;height:100%;background:var(--dim)}
+.fitbox .tot{font-weight:700;font-size:.95rem;display:flex;justify-content:space-between;border-top:1.5px solid var(--line);padding-top:7px;margin-top:2px}
+.card h3{font-size:1rem;margin:14px 0 6px;display:flex;align-items:center;gap:8px}
+.card h3::before{content:"";width:10px;height:10px;border-radius:2px;background:var(--dim,var(--sawdust))}
+.tag{display:inline-block;padding:4px 10px;border-radius:6px;background:var(--chip);margin:0 6px 6px 0;font-size:.9rem}
+.tag.hit{background:var(--pine);color:#fff}
+.quote{margin:0;padding-left:12px;border-left:3px solid var(--sawdust)}
+.masked{margin-top:16px;display:flex;gap:8px;align-items:flex-start;font-size:.88rem;color:var(--muted)}
+.stamp{position:absolute;top:22px;padding:6px 12px;border:3px solid;border-radius:8px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.2rem;opacity:0;pointer-events:none;background:var(--card)}
+.stamp.yes{right:18px;color:var(--pine);transform:rotate(8deg)}
+.stamp.no{left:18px;color:var(--rust);transform:rotate(-8deg)}
+.actions{display:flex;justify-content:center;gap:18px;margin-top:18px}
+.act{display:flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;border:2px solid var(--ink);background:var(--card);font-weight:700;cursor:pointer}
+.act.yes{background:var(--pine);border-color:var(--pine);color:#fff}
+.hint{text-align:center;color:var(--muted);font-size:.85rem;margin-top:10px}
+.empty{text-align:center;padding:60px 10px;color:var(--muted)}
+.empty h2{color:var(--ink);font-size:1.4rem;margin-bottom:8px}
+
+/* ---------- Matchs & messages ---------- */
+.match{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.match h3{font-size:1.2rem;margin-bottom:4px}
+.reveal{margin-top:12px;padding:12px;border-radius:10px;background:var(--chip);display:grid;gap:3px;font-size:.95rem}
+.reveal b{font-family:"Bricolage Grotesque",sans-serif}
+.small{font-size:.88rem;color:var(--muted)}
+.thread{margin-top:12px;display:grid;gap:8px}
+.msg{max-width:85%;padding:9px 13px;border-radius:12px;font-size:.95rem}
+.msg.me{justify-self:end;background:var(--steel);color:#fff;border-bottom-right-radius:4px}
+.msg.them{justify-self:start;background:var(--chip);border-bottom-left-radius:4px}
+.msgform{display:flex;gap:8px;margin-top:10px}
+.msgform input{flex:1}
+.msgform button{padding:0 18px;border-radius:10px;border:0;background:var(--steel);color:#fff;font-weight:700;cursor:pointer}
+
+/* ---------- Navigation basse ---------- */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+nav.tabs>div{display:flex;max-width:640px;margin:0 auto}
+nav.tabs button{flex:1;background:none;border:0;padding:12px 4px 14px;font-weight:700;font-size:.92rem;color:var(--muted);cursor:pointer;position:relative}
+nav.tabs button[aria-current="page"]{color:var(--ink)}
+nav.tabs button[aria-current="page"]::after{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;background:var(--sawdust);border-radius:0 0 3px 3px}
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--rust);color:#fff;font-size:.75rem;margin-left:4px}
+
+/* ---------- Modale & toast ---------- */
+.modal{position:fixed;inset:0;background:rgba(15,22,27,.72);display:grid;place-items:center;padding:20px;z-index:50}
+.modal .box{background:var(--card);border-radius:18px;padding:26px 22px;max-width:400px;width:100%;text-align:center}
+.modal h2{font-size:1.9rem;font-weight:800;margin:6px 0 8px}
+.modal p{color:var(--muted);margin:0 0 18px}
+.fit{width:220px;height:90px;display:block;margin:0 auto}
+.fit .left{animation:slide 1s cubic-bezier(.2,.8,.2,1) .15s both}
+@keyframes slide{from{transform:translateX(-46px)}to{transform:translateX(0)}}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:.92rem;z-index:60;max-width:90vw;text-align:center}
+@media (prefers-reduced-motion: reduce){.fit .left{animation:none}.card.fly{transition:none}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <button class="logo" id="logo" aria-label="Retour à l'accueil">
+    <svg viewBox="0 0 30 22" aria-hidden="true"><path d="M0 2h12v6h5v6h-5v6H0z" fill="var(--steel)"/><path d="M30 2H19v6h-2v6h2v6h11z" fill="var(--sawdust)"/></svg>
+    MatchWork
+  </button>
+  <button class="linkbtn" id="switch" hidden>Changer de côté</button>
+</header>
+<main class="wrap" id="app"></main>
+<nav class="tabs" id="tabs" hidden><div>
+  <button data-v="deck">Découvrir</button>
+  <button data-v="matches">Matchs</button>
+  <button data-v="profile">Profil</button>
+</div></nav>
+
+<!-- Formulaire statique détecté par Netlify au déploiement (ne pas supprimer) -->
+<form name="liste-attente" data-netlify="true" netlify-honeypot="site-web" hidden>
+  <input type="text" name="cote"><input type="email" name="email">
+  <input type="text" name="secteur"><input type="text" name="site-web">
+</form>
+
+<script>
+"use strict";
+/* ================= Référentiels ================= */
+const SAVOIRS=["Lecture de plans","Normes de sécurité","Habilitation électrique","Schémas électriques","Réglementation transport","Gestion des stocks","Comptabilité générale","HACCP / hygiène","Métrologie","DTU / normes bâtiment","Bureautique","Anglais technique"];
+const SF=["Soudure TIG","Usinage CN","Maintenance préventive","Dépannage électrique","Automatismes API","Plomberie","Chauffage / PAC","Menuiserie / agencement","Conduite PL","CACES 3","Cuisine collective","Service en salle","Aide à la personne","Gestion d'équipe","Relation client","Tableur / Excel"];
+const SE=["Fiabilité","Ponctualité","Autonomie","Esprit d'équipe","Calme sous pression","Transmission / pédagogie","Rigueur","Adaptabilité","Sens du service","Initiative","Écoute","Persévérance"];
+const MOTEURS=["Transmettre ce que je sais","Continuer d'apprendre","Voir le résultat concret","Travailler en équipe","Être autonome","Relever des défis","Stabilité","Travailler près de chez moi"];
+const CONTRATS=["CDI","CDD","Temps partiel","Intérim","Indifférent"];
+const DIMS=[["savoirs","Savoirs","var(--dim1)"],["sf","Savoir-faire","var(--dim2)"],["se","Savoir-être","var(--dim3)"]];
+const POIDS={savoirs:.3,sf:.4,se:.3};
+
+/* ================= Données de démonstration ================= */
+const OFFERS=[
+ {id:"o1",ent:"Laiterie du Serein",taille:"45 salariés",ville:"Chablis",poste:"Technicien de maintenance",contrat:"CDI",salaire:"2 400 – 2 900 € brut",
+  savoirs:["Habilitation électrique","Schémas électriques","Normes de sécurité"],sf:["Maintenance préventive","Dépannage électrique","Automatismes API"],se:["Autonomie","Calme sous pression","Rigueur"],
+  valeurs:"Une panne de nuit se règle sans paniquer et sans bâcler : on préfère une heure de plus et une réparation qui tient.",offre:"Astreinte une semaine sur quatre, majorée. Budget formation automatismes.",contact:"Claire Joly, RH — 03 86 00 11 22"},
+ {id:"o2",ent:"Transports Morin",taille:"80 salariés",ville:"Sens",poste:"Conducteur PL et tuteur",contrat:"CDI",salaire:"2 300 – 2 600 € brut",
+  savoirs:["Réglementation transport","Normes de sécurité"],sf:["Conduite PL","CACES 3"],se:["Transmission / pédagogie","Fiabilité","Ponctualité"],
+  valeurs:"On cherche quelqu'un qui a envie de former les jeunes conducteurs, pas seulement de rouler.",offre:"Une journée par semaine dédiée au tutorat, prime de transmission.",contact:"Marc Morin, gérant — 03 86 00 33 44"},
+ {id:"o3",ent:"Chauffage Bernier",taille:"6 salariés",ville:"Auxerre",poste:"Technicien chauffage / PAC",contrat:"CDI",salaire:"2 500 – 3 000 € brut",
+  savoirs:["DTU / normes bâtiment","Schémas électriques"],sf:["Chauffage / PAC","Plomberie","Relation client"],se:["Sens du service","Écoute","Autonomie"],
+  valeurs:"Le client doit repartir en ayant compris son installation. Un chantier propre, c'est notre meilleure publicité.",offre:"Véhicule attitré, pas de découchage, samedis libres.",contact:"Sophie Bernier — 06 00 00 55 66"},
+ {id:"o4",ent:"Métallerie Duroc",taille:"22 salariés",ville:"Migennes",poste:"Soudeur TIG",contrat:"CDD",salaire:"2 200 – 2 500 € brut",
+  savoirs:["Lecture de plans","Métrologie"],sf:["Soudure TIG","Usinage CN"],se:["Rigueur","Persévérance"],
+  valeurs:"Ici on signe ses pièces. Une soudure moche part au rebut même si elle tient.",offre:"CDD de 12 mois avec perspective de CDI, qualifications prises en charge.",contact:"Atelier Duroc — 03 86 00 77 88"},
+ {id:"o5",ent:"Coopérative Yonne Grains",taille:"120 salariés",ville:"Joigny",poste:"Magasinier cariste",contrat:"Intérim",salaire:"1 900 – 2 150 € brut",
+  savoirs:["Gestion des stocks","Bureautique"],sf:["CACES 3","Tableur / Excel"],se:["Fiabilité","Esprit d'équipe","Ponctualité"],
+  valeurs:"Pendant la moisson tout le monde met la main à la pâte, l'ambiance d'équipe est notre moteur.",offre:"Mission de 6 mois, embauche derrière si ça colle des deux côtés.",contact:"Pôle RH — 03 86 00 99 00"},
+ {id:"o6",ent:"Brasserie du Pont",taille:"14 salariés",ville:"Auxerre",poste:"Second de cuisine",contrat:"CDI",salaire:"2 100 – 2 400 € brut",
+  savoirs:["HACCP / hygiène"],sf:["Cuisine collective","Gestion d'équipe","Service en salle"],se:["Calme sous pression","Esprit d'équipe","Initiative"],
+  valeurs:"Le coup de feu se gère dans le calme. On goûte tout, on ne sert rien qu'on ne mangerait pas.",offre:"Service du midi seulement, fermé le week-end.",contact:"Julie Perrin — 06 00 11 22 33"},
+ {id:"o7",ent:"Cabinet Ferrand",taille:"9 salariés",ville:"Avallon",poste:"Assistant comptable",contrat:"Temps partiel",salaire:"1 300 – 1 500 € brut (28 h)",
+  savoirs:["Comptabilité générale","Bureautique"],sf:["Tableur / Excel","Relation client"],se:["Rigueur","Écoute"],
+  valeurs:"Un dossier rendu juste et à l'heure vaut mieux qu'un dossier rendu vite.",offre:"Horaires aménageables, télétravail possible un jour par semaine.",contact:"Paul Ferrand — 03 86 00 44 55"},
+ {id:"o8",ent:"Ateliers du Tonnerrois",taille:"30 salariés",ville:"Tonnerre",poste:"Responsable maintenance",contrat:"CDI",salaire:"2 900 – 3 400 € brut",
+  savoirs:["Habilitation électrique","Normes de sécurité","Métrologie"],sf:["Maintenance préventive","Automatismes API","Gestion d'équipe"],se:["Transmission / pédagogie","Initiative","Rigueur"],
+  valeurs:"Trois techniciens à faire grandir : on attend un chef qui montre au poste, pas depuis un bureau.",offre:"Plan de modernisation à piloter, budget dédié.",contact:"Direction — 03 86 00 66 77"}
+];
+const CANDS=[
+ {id:"c1",nom:"Nadia Benali",age:47,tel:"06 12 00 00 01",metier:"Soudeuse",exp:19,ville:"Sens",mobilite:50,contrat:"CDI",
+  savoirs:["Lecture de plans","Métrologie","Normes de sécurité"],sf:["Soudure TIG","Usinage CN","Gestion d'équipe"],se:["Rigueur","Transmission / pédagogie","Persévérance"],
+  moteurs:["Transmettre ce que je sais","Voir le résultat concret"],fierte:"Qualifiée sur appareils à pression ; six apprentis formés, tous en poste.",bienfait:"Un cordon régulier qu'on n'a pas besoin de reprendre, radio du premier coup."},
+ {id:"c2",nom:"Hervé Lambert",age:55,tel:"06 12 00 00 02",metier:"Chef d'atelier menuiserie",exp:30,ville:"Auxerre",mobilite:30,contrat:"Indifférent",
+  savoirs:["Lecture de plans","DTU / normes bâtiment"],sf:["Menuiserie / agencement","Gestion d'équipe","Usinage CN"],se:["Transmission / pédagogie","Fiabilité","Écoute"],
+  moteurs:["Transmettre ce que je sais","Stabilité"],fierte:"A monté de zéro un atelier d'escaliers sur mesure, de la commande à la pose.",bienfait:"Un assemblage qui s'emboîte sans forcer et sans jeu. Ça ne se discute pas, ça se voit."},
+ {id:"c3",nom:"Sandrine Petit",age:43,tel:"06 12 00 00 03",metier:"Gestionnaire de stocks",exp:18,ville:"Joigny",mobilite:25,contrat:"CDI",
+  savoirs:["Gestion des stocks","Bureautique"],sf:["Tableur / Excel","CACES 3","Gestion d'équipe"],se:["Rigueur","Esprit d'équipe","Initiative"],
+  moteurs:["Voir le résultat concret","Travailler en équipe"],fierte:"Erreurs d'inventaire divisées par deux sur une plateforme de 4 000 m².",bienfait:"Un stock où n'importe qui trouve n'importe quoi en moins de deux minutes."},
+ {id:"c4",nom:"Karim Tahar",age:38,tel:"06 12 00 00 04",metier:"Technicien commande numérique",exp:15,ville:"Migennes",mobilite:40,contrat:"CDI",
+  savoirs:["Lecture de plans","Métrologie","Schémas électriques"],sf:["Usinage CN","Automatismes API","Maintenance préventive"],se:["Autonomie","Rigueur","Adaptabilité"],
+  moteurs:["Continuer d'apprendre","Relever des défis"],fierte:"Programme et règle seul un parc de cinq machines 5 axes.",bienfait:"Une série complète dans les tolérances, sans une pièce à retoucher."},
+ {id:"c5",nom:"Isabelle Roux",age:51,tel:"06 12 00 00 05",metier:"Comptable en reconversion atelier",exp:25,ville:"Auxerre",mobilite:35,contrat:"Indifférent",
+  savoirs:["Comptabilité générale","Bureautique","Lecture de plans"],sf:["Tableur / Excel","Relation client","Menuiserie / agencement"],se:["Rigueur","Persévérance","Écoute"],
+  moteurs:["Continuer d'apprendre","Voir le résultat concret"],fierte:"25 ans de comptabilité, CAP menuiserie en cours : cherche un poste mixte gestion et atelier.",bienfait:"Un bilan juste au centime, un meuble d'aplomb au millimètre. C'est le même plaisir."},
+ {id:"c6",nom:"Didier Moreau",age:53,tel:"06 12 00 00 06",metier:"Plombier chauffagiste",exp:28,ville:"Avallon",mobilite:35,contrat:"CDI",
+  savoirs:["DTU / normes bâtiment","Schémas électriques"],sf:["Plomberie","Chauffage / PAC","Relation client"],se:["Sens du service","Fiabilité","Autonomie"],
+  moteurs:["Travailler près de chez moi","Stabilité"],fierte:"Plus de 300 pompes à chaleur posées, zéro retour en garantie l'an dernier.",bienfait:"Une chaufferie où on peut poser la main sur chaque raccord sans trouver une goutte."},
+ {id:"c7",nom:"Julien Fabre",age:34,tel:"06 12 00 00 07",metier:"Ébéniste",exp:12,ville:"Tonnerre",mobilite:60,contrat:"CDI",
+  savoirs:["Lecture de plans","DTU / normes bâtiment"],sf:["Menuiserie / agencement","Usinage CN"],se:["Rigueur","Persévérance","Initiative"],
+  moteurs:["Relever des défis","Voir le résultat concret"],fierte:"Compagnon du Devoir, agencement haut de gamme : banques d'accueil, bibliothèques cintrées.",bienfait:"Un chant plaqué qu'on ne repère pas au toucher, même les yeux fermés."},
+ {id:"c8",nom:"Martine Girard",age:49,tel:"06 12 00 00 08",metier:"Aide à domicile",exp:20,ville:"Auxerre",mobilite:20,contrat:"CDI",
+  savoirs:["HACCP / hygiène"],sf:["Aide à la personne","Cuisine collective","Relation client"],se:["Écoute","Sens du service","Ponctualité"],
+  moteurs:["Travailler près de chez moi","Transmettre ce que je sais"],fierte:"Suit depuis dix ans une douzaine de personnes âgées en milieu rural.",bienfait:"Repartir d'une maison en sachant que la personne a mangé, ri, et attend demain."}
+];
+const DEF_CAND={metier:"Technicien de maintenance",exp:24,ville:"Auxerre",mobilite:40,contrat:"CDI",
+  savoirs:["Habilitation électrique","Schémas électriques","Normes de sécurité"],sf:["Maintenance préventive","Dépannage électrique","Automatismes API","Gestion d'équipe"],se:["Autonomie","Calme sous pression","Transmission / pédagogie"],
+  moteurs:["Transmettre ce que je sais","Voir le résultat concret"],fierte:"A remis en route une ligne d'embouteillage à l'arrêt depuis trois semaines.",bienfait:"Une machine qui redémarre et qu'on n'entend plus pendant six mois.",nom:"Pascal Martin",age:52};
+const DEF_ENT={entreprise:"Menuiserie Vauthier",taille:"12 salariés",poste:"Chef d'atelier",ville:"Joigny",contrat:"CDI",salaire:"2 600 – 3 100 € brut",
+  savoirs:["Lecture de plans","DTU / normes bâtiment"],sf:["Menuiserie / agencement","Gestion d'équipe","Usinage CN"],se:["Transmission / pédagogie","Rigueur","Fiabilité"],
+  valeurs:"On livre quand c'est prêt, pas quand c'est vendredi. Et on forme nos apprentis comme on aimerait avoir été formés.",offre:"Atelier neuf, commande numérique récente, deux apprentis motivés."};
+
+/* ================= État ================= */
+const KEY="matchwork-v1";
+let S=load(),view=S.role?"deck":"home";
+function fresh(){return{role:null,cand:null,ent:null,decided:{cand:[],ent:[]},matches:{cand:[],ent:[]},seen:{cand:0,ent:0},threads:{}}}
+function load(){try{const v=localStorage.getItem(KEY);if(v)return Object.assign(fresh(),JSON.parse(v))}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function code(id){let h=0;for(const c of id+"tenon")h=(h*31+c.charCodeAt(0))>>>0;const a="ABCDEFGHJKMNPQRSTUVWXYZ23456789";let r="";for(let i=0;i<4;i++){r+=a[h%a.length];h=Math.floor(h/a.length)+i*7}return r}
+
+/* ================= Score par dimension ================= */
+function dimScore(have,want){if(!want||!want.length)return null;const h=new Set(have||[]);return Math.round(100*want.filter(s=>h.has(s)).length/want.length)}
+function fitDetail(profil,attentes){
+  let tot=0,pd=0;const det={};
+  for(const[k]of DIMS){const s=dimScore(profil[k],attentes[k]);det[k]=s;if(s!==null){tot+=s*POIDS[k];pd+=POIDS[k]}}
+  det.total=pd?Math.round(tot/pd):0;return det;
+}
+
+/* ================= Rendu ================= */
+const app=document.getElementById("app"),tabs=document.getElementById("tabs"),sw=document.getElementById("switch");
+function render(){
+  tabs.hidden=!S.role||view==="home"||view==="setup";
+  sw.hidden=!S.role||view==="home";
+  tabs.querySelectorAll("button").forEach(b=>{
+    b.setAttribute("aria-current",b.dataset.v===view?"page":"false");
+    if(b.dataset.v==="matches"){const n=S.role?S.matches[S.role].length-S.seen[S.role]:0;
+      b.innerHTML="Matchs"+(n>0&&view!=="matches"?`<span class="badge">${n}</span>`:"")}
+  });
+  if(view==="home")home();
+  else if(view==="setup"||view==="profile")setup();
+  else if(view==="deck")deck();
+  else if(view==="matches")matches();
+}
+function jointSvg(cls){return `<svg class="${cls}" viewBox="0 0 220 90" role="img" aria-label="Un tenon qui s'emboîte dans une mortaise">
+  <g class="left"><path d="M10 10h80v24h34v22H90v24H10z" fill="var(--steel)"/></g>
+  <path d="M210 10h-86v24h0v22h0v24h86z" fill="var(--sawdust)"/></svg>`}
+function lockIcon(){return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>`}
+
+/* ---------- Accueil ---------- */
+function home(){
+  app.innerHTML=`<section class="hero">
+    <h1>Le métier d'abord. Le reste après le match.</h1>
+    <p>Ici, un profil raconte ce qu'on sait, ce qu'on sait faire et comment on est au travail. Nom, âge et photo restent cachés tant que l'intérêt n'est pas réciproque.</p>
+    ${jointSvg("joint")}
+    <div class="choices">
+      <button class="bigbtn primary" data-role="cand"><strong>Je cherche un poste</strong><span>Mon expérience parle avant mon état civil</span></button>
+      <button class="bigbtn" data-role="ent"><strong>Je recrute</strong><span>Je découvre des parcours, pas des âges</span></button>
+    </div>
+    <div class="triad">
+      <div style="--dim:var(--dim1)"><b>Savoirs</b><span>Ce qu'on connaît : normes, plans, habilitations, réglementation.</span></div>
+      <div style="--dim:var(--dim2)"><b>Savoir-faire</b><span>Les gestes du métier, acquis sur le terrain, année après année.</span></div>
+      <div style="--dim:var(--dim3)"><b>Savoir-être</b><span>Comment on est au travail : fiable, calme, à l'écoute, prêt à transmettre.</span></div>
+    </div>
+    <ol class="steps">
+      <li><div><b>Un profil sans visage</b><span>Trois dimensions de compétence, une motivation, une fierté professionnelle. Rien d'autre n'est montré.</span></div></li>
+      <li><div><b>Un intérêt des deux côtés</b><span>Chacun indique qui l'intéresse, dimension par dimension. Personne ne sait qui l'a écarté.</span></div></li>
+      <li><div><b>L'identité se dévoile</b><span>Au match seulement, nom, âge et contact apparaissent, et la discussion s'ouvre.</span></div></li>
+    </ol>
+    <section class="waitlist">
+      <h2>Participer au vrai test</h2>
+      <p>Cette page est une démonstration. Laisse ton adresse pour être prévenu quand une version grandeur nature ouvrira près de chez toi.</p>
+      <form id="wl">
+        <p class="hp"><label>Ne pas remplir : <input type="text" name="site-web" tabindex="-1" autocomplete="off"></label></p>
+        <div class="row2">
+          <label class="f">Je suis<select name="cote"><option>Candidat</option><option>Recruteur</option><option>Curieux</option></select></label>
+          <label class="f">Secteur<input type="text" name="secteur" placeholder="industrie, bâtiment…"></label>
+        </div>
+        <label class="f">Adresse e-mail<input type="email" name="email" required placeholder="toi@exemple.fr"></label>
+        <button class="submit">M'inscrire à la liste d'attente</button>
+      </form>
+    </section>
+    <p class="demo-note">Démo : profils et offres sont fictifs, l'autre côté répond automatiquement selon la compatibilité, et tes données restent dans ton navigateur. Seule l'inscription ci-dessus est réellement envoyée.</p>
+  </section>`;
+  app.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{S.role=b.dataset.role;save();view=S[S.role]?"deck":"setup";render();scrollTo(0,0)});
+  document.getElementById("wl").onsubmit=async e=>{
+    e.preventDefault();const f=e.target,fd=new FormData(f);fd.append("form-name","liste-attente");
+    try{
+      const r=await fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(fd).toString()});
+      if(r.ok){f.reset();toast("Inscription envoyée. Merci !")}else throw 0;
+    }catch(_){toast("Envoi impossible ici — l'inscription fonctionnera une fois le site déployé sur Netlify.")}
+  };
+}
+
+/* ---------- Profil / offre ---------- */
+function chips(list,sel,name){return `<div class="chips" data-g="${name}">${list.map(s=>`<button type="button" class="chip" aria-pressed="${sel.includes(s)}" data-s="${esc(s)}">${esc(s)}</button>`).join("")}
+  </div><div class="addchip"><input type="text" placeholder="Ajouter le tien…" aria-label="Ajouter un élément"><button type="button">Ajouter</button></div>`}
+function opts(list,v){return list.map(o=>`<option ${o===v?"selected":""}>${esc(o)}</option>`).join("")}
+function dimFieldset(k,label,color,hint,list,sel){
+  return `<fieldset class="dim" style="--dim:${color}"><legend>${label}</legend><p class="dimhint">${hint}</p>${chips(list,sel,k)}</fieldset>`}
+
+function setup(){
+  const isC=S.role==="cand";
+  const d=isC?(S.cand||DEF_CAND):(S.ent||DEF_ENT);
+  app.innerHTML=isC?`
+  <h1 class="pagetitle">${S.cand?"Mon profil":"Créer mon profil"}</h1>
+  <p class="lead">Ce que les recruteurs verront : ton métier et tes trois dimensions de compétence. L'état civil attend le match.</p>
+  <form class="pf" id="f">
+    <label class="f">Métier ou poste recherché<input type="text" name="metier" required value="${esc(d.metier)}"></label>
+    <div class="row2">
+      <label class="f">Années de métier<input type="number" name="exp" min="0" max="50" required value="${esc(d.exp)}"></label>
+      <label class="f">Contrat souhaité<select name="contrat">${opts(CONTRATS,d.contrat)}</select></label>
+    </div>
+    <div class="row2">
+      <label class="f">Ville<input type="text" name="ville" value="${esc(d.ville)}"></label>
+      <label class="f">Mobilité (km)<input type="number" name="mobilite" min="0" max="300" value="${esc(d.mobilite)}"></label>
+    </div>
+    ${dimFieldset("savoirs","Savoirs","var(--dim1)","Ce que tu connais : normes, plans, habilitations…",SAVOIRS,d.savoirs)}
+    ${dimFieldset("sf","Savoir-faire","var(--dim2)","Les gestes de ton métier, ce que tes mains savent faire.",SF,d.sf)}
+    ${dimFieldset("se","Savoir-être","var(--dim3)","Comment tu es au travail. Choisis-en trois ou quatre, ceux qui te ressemblent vraiment.",SE,d.se)}
+    <fieldset><legend>Ce qui me fait avancer</legend><p class="dimhint">Ta motivation, ce que tu viens chercher dans un poste.</p>${chips(MOTEURS,d.moteurs||[],"moteurs")}</fieldset>
+    <label class="f">Une réalisation dont tu es fier<small>Une phrase concrète vaut mieux qu'un CV entier.</small><textarea name="fierte">${esc(d.fierte)}</textarea></label>
+    <label class="f">Pour toi, un travail bien fait c'est…<small>Ta définition à toi. C'est souvent elle qui fait la différence.</small><textarea name="bienfait">${esc(d.bienfait||"")}</textarea></label>
+    <div class="private">
+      <div class="private-h">${lockIcon()} Masqué jusqu'au match</div>
+      <div class="row2">
+        <label class="f">Nom<input type="text" name="nom" value="${esc(d.nom)}"></label>
+        <label class="f">Âge<input type="number" name="age" min="16" max="75" value="${esc(d.age)}"></label>
+      </div>
+    </div>
+    <button class="submit">Enregistrer et découvrir les offres</button>
+  </form>
+  <div class="toolrow">
+    <button class="ghost" id="exp">Exporter mon profil</button>
+    <button class="ghost" id="imp">Importer un profil</button>
+    <input type="file" id="impf" accept=".json" hidden>
+  </div>
+  ${S.cand?`<h2 class="pagetitle" style="font-size:1.3rem;margin-top:34px">Ce que voit un recruteur</h2><div style="position:relative">${candCard({...S.cand,id:"me"},{savoirs:[],sf:[],se:[]},true)}</div>`:""}
+  `:`
+  <h1 class="pagetitle">${S.ent?"Mon offre":"Publier une offre"}</h1>
+  <p class="lead">Décris le poste par les trois dimensions attendues. Les candidats te seront présentés sans nom, âge ni photo.</p>
+  <form class="pf" id="f">
+    <div class="row2">
+      <label class="f">Entreprise<input type="text" name="entreprise" required value="${esc(d.entreprise)}"></label>
+      <label class="f">Taille<input type="text" name="taille" value="${esc(d.taille||"")}" placeholder="12 salariés"></label>
+    </div>
+    <label class="f">Poste<input type="text" name="poste" required value="${esc(d.poste)}"></label>
+    <div class="row2">
+      <label class="f">Ville<input type="text" name="ville" value="${esc(d.ville)}"></label>
+      <label class="f">Contrat<select name="contrat">${opts(CONTRATS.slice(0,4),d.contrat)}</select></label>
+    </div>
+    <label class="f">Rémunération<input type="text" name="salaire" value="${esc(d.salaire)}"></label>
+    ${dimFieldset("savoirs","Savoirs attendus","var(--dim1)","Connaissances nécessaires au poste.",SAVOIRS,d.savoirs)}
+    ${dimFieldset("sf","Savoir-faire attendus","var(--dim2)","Les gestes techniques dont le poste a besoin.",SF,d.sf)}
+    ${dimFieldset("se","Savoir-être recherchés","var(--dim3)","Comment on travaille chez vous. Trois ou quatre, pas plus : les vrais.",SE,d.se)}
+    <label class="f">Ce qui compte chez vous<small>Votre définition du travail bien fait. Les candidats la lisent avant de swiper.</small><textarea name="valeurs">${esc(d.valeurs||"")}</textarea></label>
+    <label class="f">Ce que vous offrez<small>Conditions, ambiance, perspectives : ce qui donne envie.</small><textarea name="offre">${esc(d.offre||"")}</textarea></label>
+    <button class="submit">Enregistrer et découvrir les profils</button>
+  </form>
+  <div class="toolrow">
+    <button class="ghost" id="exp">Exporter mon offre</button>
+    <button class="ghost" id="imp">Importer une offre</button>
+    <input type="file" id="impf" accept=".json" hidden>
+  </div>`;
+  /* chips */
+  app.querySelectorAll(".chip").forEach(c=>c.onclick=()=>c.setAttribute("aria-pressed",c.getAttribute("aria-pressed")!=="true"));
+  app.querySelectorAll(".addchip").forEach(a=>{
+    const inp=a.querySelector("input"),g=a.previousElementSibling;
+    const add=()=>{const v=inp.value.trim();if(!v)return;
+      if([...g.querySelectorAll(".chip")].some(c=>c.dataset.s.toLowerCase()===v.toLowerCase())){inp.value="";return}
+      const b=document.createElement("button");b.type="button";b.className="chip";b.dataset.s=v;b.textContent=v;b.setAttribute("aria-pressed","true");
+      b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");g.appendChild(b);inp.value=""};
+    a.querySelector("button").onclick=add;
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();add()}});
+  });
+  document.getElementById("f").onsubmit=e=>{
+    e.preventDefault();
+    const fd=Object.fromEntries(new FormData(e.target));
+    for(const g of["savoirs","sf","se","moteurs"]){const el=app.querySelector(`.chips[data-g="${g}"]`);if(el)fd[g]=[...el.querySelectorAll('.chip[aria-pressed="true"]')].map(c=>c.dataset.s)}
+    if(!(fd.savoirs?.length||fd.sf?.length||fd.se?.length)){toast("Choisis au moins une compétence dans une des trois dimensions.");return}
+    ["exp","age","mobilite"].forEach(k=>{if(k in fd)fd[k]=Number(fd[k])||0});
+    S[S.role]=fd;save();view="deck";render();scrollTo(0,0);
+  };
+  document.getElementById("exp").onclick=()=>{
+    const d2=S[S.role];if(!d2){toast("Enregistre d'abord.");return}
+    const b=new Blob([JSON.stringify({matchwork:1,role:S.role,data:d2},null,2)],{type:"application/json"});
+    const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=`matchwork-${S.role}.json`;a.click();URL.revokeObjectURL(u);
+  };
+  document.getElementById("imp").onclick=()=>document.getElementById("impf").click();
+  document.getElementById("impf").onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    f.text().then(t=>{const o=JSON.parse(t);if(o?.matchwork!==1||!o.data)throw 0;S[o.role||S.role]=o.data;save();render();toast("Profil importé.")}).catch(()=>toast("Fichier non reconnu."));
+  };
+}
+
+/* ---------- Cartes ---------- */
+function fitBox(det,label){
+  return `<div class="fitbox">${DIMS.map(([k,n,c])=>det[k]===null?"":`<div class="frow" style="--dim:${c}"><span>${n}</span><div class="gauge"><i style="width:${det[k]}%"></i></div><span>${det[k]} %</span></div>`).join("")}
+  <div class="tot"><span>${label}</span><span>${det.total} %</span></div></div>`}
+function tags(list,want){const w=new Set(want||[]);return (list||[]).map(s=>`<span class="tag ${w.has(s)?"hit":""}">${esc(s)}</span>`).join("")||'<span class="small">—</span>'}
+function dimBlock(k,n,c,list,want){return `<h3 style="--dim:${c}">${n}</h3><div>${tags(list,want)}</div>`}
+
+function candCard(c,att,static_){
+  const det=fitDetail(c,att);
+  return `<article class="card ${static_?"":"top"}" ${static_?'style="position:relative;height:auto;inset:auto"':""} data-id="${c.id}">
+    ${static_?"":'<span class="stamp yes">Intéressé</span><span class="stamp no">Passer</span>'}
+    <div class="code">Profil ${code(c.id)}</div>
+    <h2>${esc(c.metier)}</h2>
+    <div class="meta"><span>${esc(c.exp)} ans de métier</span><span>${esc(c.ville)} + ${esc(c.mobilite)} km</span><span>${esc(c.contrat)}</span></div>
+    ${static_?"":fitBox(det,"Compatibilité avec l'offre")}
+    ${DIMS.map(([k,n,col])=>dimBlock(k,n,col,c[k],att[k])).join("")}
+    ${c.moteurs?.length?`<h3 style="--dim:var(--sawdust)">Ce qui le fait avancer</h3><div>${c.moteurs.map(m=>`<span class="tag">${esc(m)}</span>`).join("")}</div>`:""}
+    ${c.fierte?`<h3 style="--dim:var(--sawdust)">Sa fierté</h3><p class="quote">${esc(c.fierte)}</p>`:""}
+    ${c.bienfait?`<h3 style="--dim:var(--sawdust)">Le travail bien fait, pour lui</h3><p class="quote">${esc(c.bienfait)}</p>`:""}
+    <div class="masked">${lockIcon()}<span>Nom, âge, photo et coordonnées masqués jusqu'au match.</span></div>
+  </article>`}
+
+function offerCard(o,me){
+  const det=fitDetail(me,o);
+  return `<article class="card top" data-id="${o.id}">
+    <span class="stamp yes">Intéressé</span><span class="stamp no">Passer</span>
+    <div class="code">${esc(o.ent)}, ${esc(o.taille||"")}</div>
+    <h2>${esc(o.poste)}</h2>
+    <div class="meta"><span>${esc(o.ville)}</span><span>${esc(o.contrat)}</span><span>${esc(o.salaire)}</span></div>
+    ${fitBox(det,"Ton profil couvre")}
+    ${DIMS.map(([k,n,col])=>dimBlock(k,n+" attendus",col,o[k],me[k])).join("")}
+    ${o.valeurs?`<h3 style="--dim:var(--sawdust)">Le travail bien fait, chez eux</h3><p class="quote">${esc(o.valeurs)}</p>`:""}
+    ${o.offre?`<h3 style="--dim:var(--sawdust)">Ce qu'ils offrent</h3><p class="quote">${esc(o.offre)}</p>`:""}
+    <div class="masked">${lockIcon()}<span>Ils ne verront ton nom et ton âge qu'en cas de match.</span></div>
+  </article>`}
+
+function pool(){
+  const r=S.role,done=new Set(S.decided[r]);
+  if(r==="cand")return OFFERS.filter(o=>!done.has(o.id)).map(o=>({o,s:fitDetail(S.cand,o).total})).sort((a,b)=>b.s-a.s).map(x=>x.o);
+  return CANDS.filter(c=>!done.has(c.id)).map(c=>({c,s:fitDetail(c,S.ent).total})).sort((a,b)=>b.s-a.s).map(x=>x.c);
+}
+
+function deck(){
+  const list=pool(),r=S.role;
+  if(!list.length){
+    app.innerHTML=`<div class="empty"><h2>Tu as tout parcouru</h2><p>${S.matches[r].length} match${S.matches[r].length>1?"s":""} pour l'instant. Élargis tes dimensions ou revois les cartes écartées.</p>
+    <button class="ghost" id="rs">Revoir les cartes écartées</button></div>`;
+    document.getElementById("rs").onclick=()=>{const m=new Set(S.matches[r].map(x=>x.id));S.decided[r]=S.decided[r].filter(id=>m.has(id));save();render()};
+    return;
+  }
+  const top=list[0],next=list[1];
+  const mk=x=>r==="cand"?offerCard(x,S.cand):candCard(x,S.ent);
+  app.innerHTML=`<p class="lead" style="margin:4px 0 8px">${r==="cand"?`${list.length} offre${list.length>1?"s":""} autour de ${esc(S.cand.ville)}`:`${list.length} profil${list.length>1?"s":""} pour « ${esc(S.ent.poste)} »`}</p>
+  <div class="deck">${next?mk(next).replace('class="card top"','class="card under" aria-hidden="true"'):""}${mk(top)}</div>
+  <div class="actions"><button class="act" id="no">Passer</button><button class="act yes" id="yes">Intéressé</button></div>
+  <p class="hint">Glisse la carte ou utilise les flèches du clavier.</p>`;
+  const card=app.querySelector(".card.top");
+  const yes=card.querySelector(".stamp.yes"),no=card.querySelector(".stamp.no");
+  let x0=null,dx=0;
+  card.addEventListener("pointerdown",e=>{x0=e.clientX;dx=0;card.setPointerCapture(e.pointerId);card.style.cursor="grabbing"});
+  card.addEventListener("pointermove",e=>{if(x0===null)return;dx=e.clientX-x0;card.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`;
+    yes.style.opacity=Math.max(0,Math.min(1,dx/90));no.style.opacity=Math.max(0,Math.min(1,-dx/90))});
+  const end=()=>{if(x0===null)return;x0=null;card.style.cursor="";
+    if(Math.abs(dx)>100)fling(card,top.id,dx>0);
+    else{card.classList.add("fly");card.style.transform="";yes.style.opacity=0;no.style.opacity=0;setTimeout(()=>card.classList.remove("fly"),350)}};
+  card.addEventListener("pointerup",end);card.addEventListener("pointercancel",end);
+  document.getElementById("yes").onclick=()=>fling(card,top.id,true);
+  document.getElementById("no").onclick=()=>fling(card,top.id,false);
+}
+function fling(card,id,like){
+  card.classList.add("fly");
+  card.style.transform=`translateX(${like?600:-600}px) rotate(${like?25:-25}deg)`;card.style.opacity=0;
+  setTimeout(()=>decide(id,like),260);
+}
+function decide(id,like){
+  const r=S.role;S.decided[r].push(id);let matched=null;
+  if(like){
+    if(r==="cand"){const o=OFFERS.find(x=>x.id===id);if(fitDetail(S.cand,o).total>=45)matched=o}
+    else{const c=CANDS.find(x=>x.id===id);
+      const ok=fitDetail(c,S.ent).total>=40&&(c.contrat==="Indifférent"||!S.ent.contrat||c.contrat===S.ent.contrat);
+      if(ok)matched=c}
+    if(matched)S.matches[r].unshift({id,at:Date.now()});
+  }
+  save();render();
+  if(matched)showMatch(matched);
+}
+function showMatch(x){
+  const isC=S.role==="cand";
+  const m=document.createElement("div");m.className="modal";m.setAttribute("role","dialog");m.setAttribute("aria-modal","true");
+  m.innerHTML=`<div class="box">${jointSvg("fit")}<h2>Ça s'emboîte</h2>
+  <p>${isC?`${esc(x.ent)} s'intéresse aussi à ton profil. Ils découvrent maintenant ton nom.`:`Le profil ${code(x.id)} est intéressé par ton offre. Son identité est maintenant visible.`}</p>
+  <button class="submit" id="see" style="width:100%">Voir le match</button>
+  <button class="linkbtn" id="cont" style="margin-top:8px">Continuer à découvrir</button></div>`;
+  document.body.appendChild(m);
+  const close=()=>m.remove();
+  m.querySelector("#see").onclick=()=>{close();view="matches";render()};
+  m.querySelector("#cont").onclick=close;
+  m.querySelector("#see").focus();
+}
+
+/* ---------- Matchs + messagerie ---------- */
+const REPLIES={cand:["Bonjour, merci pour votre intérêt ! Quand seriez-vous disponible pour passer nous voir à l'atelier ?","Vos réponses nous plaisent. On vous propose une visite du poste avant tout entretien formel, ça vous va ?"],
+  ent:["Bonjour, merci pour votre message. Je peux passer vous rencontrer en fin de semaine si ça vous arrange.","Volontiers ! Je préfère commencer par voir le poste en vrai, on discute mieux sur place."]};
+function threadKey(id){return S.role+"|"+id}
+function matches(){
+  const r=S.role,list=S.matches[r];S.seen[r]=list.length;save();
+  if(!list.length){app.innerHTML=`<div class="empty"><h2>Pas encore de match</h2><p>Un match apparaît quand l'intérêt est réciproque. Continue à découvrir ${r==="cand"?"les offres":"les profils"}.</p><button class="ghost" id="go">Découvrir</button></div>`;
+    document.getElementById("go").onclick=()=>{view="deck";render()};return}
+  app.innerHTML=`<h1 class="pagetitle">Mes matchs</h1><p class="lead">L'intérêt est réciproque : identités dévoilées, discussion ouverte.</p>`+
+  list.map(({id})=>{
+    const th=S.threads[threadKey(id)]||[];
+    const msgs=th.map(m=>`<div class="msg ${m.me?"me":"them"}">${esc(m.t)}</div>`).join("");
+    let head;
+    if(r==="cand"){const o=OFFERS.find(x=>x.id===id);
+      head=`<h3>${esc(o.poste)}</h3><div class="small">${esc(o.ent)}, ${esc(o.ville)}, ${esc(o.contrat)}</div>
+      <div class="reveal"><b>Contact</b><span>${esc(o.contact)}</span></div>`}
+    else{const c=CANDS.find(x=>x.id===id);
+      head=`<h3>${esc(c.metier)}</h3><div class="small">Profil ${code(c.id)}, ${esc(c.exp)} ans de métier</div>
+      <div class="reveal"><b>${esc(c.nom)}, ${esc(c.age)} ans</b><span>${esc(c.ville)}, ${esc(c.tel)}</span></div>`}
+    return `<div class="match" data-id="${id}">${head}
+      <div class="thread">${msgs}</div>
+      <form class="msgform"><input type="text" placeholder="Écrire un message…" aria-label="Message" maxlength="300"><button>Envoyer</button></form>
+    </div>`}).join("")+
+  `<button class="linkbtn" id="reset" style="margin-top:20px">Recommencer la démo depuis zéro</button>`;
+  app.querySelectorAll(".match").forEach(el=>{
+    el.querySelector(".msgform").onsubmit=e=>{
+      e.preventDefault();const inp=e.target.querySelector("input"),t=inp.value.trim();if(!t)return;
+      const k=threadKey(el.dataset.id);S.threads[k]=S.threads[k]||[];S.threads[k].push({me:1,t});save();inp.value="";
+      const th=el.querySelector(".thread");th.insertAdjacentHTML("beforeend",`<div class="msg me">${esc(t)}</div>`);
+      const nb=S.threads[k].filter(m=>!m.me).length;
+      if(nb<2)setTimeout(()=>{const rep=REPLIES[S.role][nb]||REPLIES[S.role][0];S.threads[k].push({me:0,t:rep});save();
+        th.insertAdjacentHTML("beforeend",`<div class="msg them">${esc(rep)}</div>`)},900);
+    };
+  });
+  document.getElementById("reset").onclick=()=>{if(confirm("Effacer profils, choix, matchs et messages de la démo ?")){S=fresh();save();view="home";render()}};
+}
+
+/* ---------- Divers ---------- */
+function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),3200)}
+tabs.querySelectorAll("button").forEach(b=>b.onclick=()=>{view=b.dataset.v;render();scrollTo(0,0)});
+document.getElementById("logo").onclick=()=>{view="home";render()};
+sw.onclick=()=>{S.role=S.role==="cand"?"ent":"cand";save();view=S[S.role]?"deck":"setup";render();toast(S.role==="cand"?"Côté candidat":"Côté recruteur")};
+document.addEventListener("keydown",e=>{
+  if(view!=="deck"||document.querySelector(".modal")||/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName))return;
+  if(e.key==="ArrowRight")document.getElementById("yes")?.click();
+  if(e.key==="ArrowLeft")document.getElementById("no")?.click();
+});
+render();
+</script>
+</body>
+</html>
